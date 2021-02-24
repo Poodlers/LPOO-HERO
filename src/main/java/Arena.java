@@ -64,7 +64,10 @@ public class Arena {
     }
     public void moveMonsters(){
         for(Monster monster: monsters){
-            monster.setPosition(monster.move());
+            Position new_mons_pos = monster.move();
+            if(canHeroMove(new_mons_pos)){
+                monster.setPosition(new_mons_pos);
+            }
         }
     }
     private void checkMonsterCollision(Position position){
@@ -77,7 +80,6 @@ public class Arena {
     }
 
     public void processKey(KeyStroke key) throws IOException {
-        moveMonsters();
         switch(key.getKeyType()){
             case ArrowDown:
                 moveHero(hero.moveDown());
@@ -92,7 +94,9 @@ public class Arena {
                 moveHero(hero.moveRight());
                 break;
         }
-
+        checkMonsterCollision(hero.getPos());
+        moveMonsters();
+        checkMonsterCollision(hero.getPos());
     }
     private boolean canHeroMove(Position pos){
         for(Wall wall: walls){
@@ -106,7 +110,6 @@ public class Arena {
         if(canHeroMove(position)){
             hero.setPosition(position);
             retrieveCoins(position);
-            checkMonsterCollision(position);
         }
     }
     public void draw(TextGraphics graphics){
