@@ -14,7 +14,7 @@ import java.io.IOException;
 
 public class Game {
     private Screen screen;
-    private Arena arena = new Arena(100,100);
+    private Arena arena = new Arena(50,100);
 
     Game(){
         try{
@@ -35,7 +35,6 @@ public class Game {
     }
 
     public void run(){
-
         try{
             while(true){
                 screen.clear();
