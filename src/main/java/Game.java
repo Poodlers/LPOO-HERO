@@ -11,14 +11,20 @@ import com.googlecode.lanterna.terminal.Terminal;
 import com.googlecode.lanterna.input.KeyStroke;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 public class Game {
     private Screen screen;
-    private Arena arena = new Arena(50,100);
-
+    //private Arena arena = new Arena("C:\\Users\\radio\\OneDrive\\Ambiente de Trabalho\\PwoGwammingUwU\\Java Projects\\hero\\arena.txt");
+    private List<MyScreen> screenList;
+    private int currentArena;
     Game(){
+        screenList = createScreen();
+        currentArena = 1;
         try{
-            TerminalSize terminalSize = new TerminalSize(100, 100);
+            TerminalSize terminalSize = new TerminalSize(100, 50);
             DefaultTerminalFactory terminalFactory = new DefaultTerminalFactory().setInitialTerminalSize(terminalSize);
             Terminal terminal = terminalFactory.createTerminal();
             this.screen = new TerminalScreen(terminal);
@@ -30,16 +36,43 @@ public class Game {
 
     }
 
-    private void processKey(KeyStroke key) throws IOException {
-        arena.processKey(key);
+    private List<MyScreen> createScreen() {
+        Random random = new Random();
+        ArrayList<MyScreen> arenas = new ArrayList<>();
+        arenas.add(new WinScreen(50,100,"You Lost!!!"));
+        for (int i = 0; i < 3; i++){
+            arenas.add(new Arena(50,100));
+        }
+        arenas.add(new WinScreen(50,100,"You Won!!!!"));
+        return arenas;
     }
 
+    private void processKey(KeyStroke key) throws IOException {
+        screenList.get(currentArena).processKey(key);
+    }
+    private void restart(){
+        this.screenList = createScreen();
+        currentArena = 1;
+
+    }
     public void run(){
         try{
             while(true){
+                if(screenList.get(currentArena).isArenaComplete()){
+                    if(currentArena == this.screenList.size() - 1){
+                        restart();
+                    }else{
+                        currentArena++;
+                    }
+
+                }
+                if(screenList.get(currentArena).gameIsLost()){
+                    currentArena = 0;
+                }
                 screen.clear();
-                arena.draw(screen.newTextGraphics());
+                screenList.get(currentArena).draw(screen.newTextGraphics());
                 screen.refresh();
+
                 KeyStroke key = screen.readInput();
                 if(key.getKeyType() == KeyType.EOF){
                     break;
